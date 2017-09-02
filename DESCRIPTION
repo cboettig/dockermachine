@@ -1,0 +1,16 @@
+Package: dockermachine
+Type: Package
+Title: Interface to 'Docker' Machine
+Version: 0.1.0
+Authors@R: person("Carl", "Boettiger", 
+                  role=c("aut", "cre", "cph"), 
+                  email="cboettig@gmail.com", 
+                  comment="http://orcid.org/0000-0002-1642-628X")
+Description: Use 'Docker' Machine to create, control, and destroy cloud
+    instances on a wide variety of cloud platforms directly from R.
+    See the official Docker-Machine documentation for details: 
+    <https://docs.docker.com/machine>
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
