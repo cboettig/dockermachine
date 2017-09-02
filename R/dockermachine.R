@@ -62,6 +62,8 @@ machine_config <- function(swarm = FALSE, env = character()){
 
 # FIXME driver should list all possible drivers and then match.arg
 machine_create <- function(driver = "none",
+                           name = "machine",
+                           driver_conf = list(),
                            engine = list(install_url = "https://get.docker.com",
                                        opt = character(),
                                        insecure_registry = character(),
@@ -81,10 +83,12 @@ machine_create <- function(driver = "none",
                            env = character()){
 
   args <- "create"
+  args <- c(args, opt_to_args(list(driver = driver)))
+  args <- c(args, opts_to_args(driver_conf))
   args <- c(args, engine, "engine")
   if(swarm) args <- paste(args, "--swarm")
   args <- c(args, opts_to_args(swarm_conf, 'swarm'))
-
+  args <- c(args, name)
   dockermachine(args, env=env)
 }
 
