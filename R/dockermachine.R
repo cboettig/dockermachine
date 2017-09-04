@@ -83,7 +83,7 @@ machine_create <- function(driver = "none",
                            env = character()){
 
   args <- "create"
-  args <- c(args, opt_to_args(list(driver = driver)))
+  args <- c(args, opts_to_args(list(driver = driver)))
   args <- c(args, opts_to_args(driver_conf))
   args <- c(args, engine, "engine")
   if(swarm) args <- paste(args, "--swarm")

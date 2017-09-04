@@ -26,8 +26,10 @@
 #' @param force Whether to install dockermachine even if it has already been installed.
 #'   This may be useful when upgrading dockermachine
 #' @export
+#'
+#' @importFrom utils download.file
 install_dockermachine = function(
-  version = 'latest', use_brew = Sys.which('brew') != '', force = FALSE
+  version = 'latest', force = FALSE
 ) {
 
   if (Sys.which('docker-machine') != '' && !force) {
@@ -42,19 +44,18 @@ install_dockermachine = function(
     r = '^.*?releases/tag/v([0-9.]+)".*'
     version = gsub(r, '\\1', grep(r, h, value = TRUE)[1])
     message('The latest docker-machine version is ', version)
-  } else if (use_brew) warning(
-    "when use_brew = TRUE, only the latest version of docker-machine can be installed"
-  )
+  }
   version = gsub('^[vV]', '', version)  # pure version number
   version2 = as.numeric_version(version)
-  bit = if (grepl('64', Sys.info()[['machine']])) '64bit' else '32bit'
+  bit = system2("uname", "-m", stdout = TRUE)
+    #if (grepl('64', Sys.info()[['machine']])) '64bit' else '32bit'
   base = sprintf('https://github.com/docker/machine/releases/download/v%s/', version)
   owd = setwd(tempdir())
   on.exit(setwd(owd), add = TRUE)
   unlink(sprintf('docker-machine_%s*', version), recursive = TRUE)
 
   download_zip = function(OS, type = 'zip') {
-    zipfile = sprintf('docker-machine_%s_%s-%s.%s', version, OS, bit, type)
+    zipfile = sprintf('docker-machine-%s-%s', OS, bit)
     download2(paste0(base, zipfile), zipfile, mode = 'wb')
     switch(type, zip = utils::unzip(zipfile), tar.gz = {
       files = utils::untar(zipfile, list = TRUE)
@@ -65,13 +66,11 @@ install_dockermachine = function(
 
   files = if (is_windows()) {
     download_zip('Windows')
-  } else if (is_osx()) {
+  } #else if (is_osx()) {
+    else {
     download_zip(
-      if (version2 >= '0.18') 'macOS' else 'MacOS',
-      if (version2 >= '0.20.3') 'tar.gz' else 'zip'
+      system2("uname", "-s", stdout = TRUE)
     )
-  } else {
-    download_zip('Linux', 'tar.gz')  # _might_ be Linux; good luck
   }
   exec = files[grep(sprintf('^dockermachine_%s.+', version), basename(files))][1]
   if (is_windows()) {
@@ -142,14 +141,33 @@ find_dockermachine = local({
   function() {
     if (is.null(path)) {
       path <<- find_exec(
-        'dockermachine', 'dockermachine', 'You can install it via blogdown::install_dockermachine()'
+        'dockermachine', 'dockermachine', 'You can install it via dockermachine::install_dockermachine()'
       )
       ver = dockermachine_version()
-      if (is.numeric_version(ver) && ver < '0.18') stop(
-        'Found dockermachine at ', path, ' but the version is too low (', ver, '). ',
-        'You may try blogdown::install_dockermachine(force = TRUE).'
-      )
     }
     path
   }
 })
+
+#' dockermachine_cmd
+#'
+#' Run an arbitrary docker-machine command
+#' @param ... Arguments to be passed to \code{system2('docker-machine', ...)}, e.g.
+#'   \code{new_content(path)} is basically \code{dockermachine_cmd(c('new', path))} (i.e.
+#'   run the command \command{docker-machine new path}).
+#' @export
+#' @describeIn dockermachine_cmd Run an arbitrary docker-machine command.
+dockermachine_cmd = function(...) {
+  system2(find_dockermachine(), ...)
+}
+
+#' @export
+#' @describeIn dockermachine_cmd Return the version number of docker-machine if possible, which is
+#'   extracted from the output of \code{dockermachine_cmd('version')}.
+dockermachine_version = function() {
+  x = dockermachine_cmd('version', stdout = TRUE)
+  r = '^.* v([0-9.]{2,}).*$'
+  if (grepl(r, x)) return(as.numeric_version(gsub(r, '\\1', x)))
+  warning('Cannot extract the version number from docker-machine:')
+  cat(x, sep = '\n')
+}

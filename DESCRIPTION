@@ -9,8 +9,8 @@ Authors@R: person("Carl", "Boettiger",
 Description: Use 'Docker' Machine to create, control, and destroy cloud
     instances on a wide variety of cloud platforms directly from R.
     See the official Docker-Machine documentation for details: 
-    <https://docs.docker.com/machine>
-License: MIT
+    <https://docs.docker.com/machine>.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

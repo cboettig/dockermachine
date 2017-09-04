@@ -5,8 +5,7 @@
 \alias{update_dockermachine}
 \title{Install dockermachine}
 \usage{
-install_dockermachine(version = "latest", use_brew = Sys.which("brew") !=
-  "", force = FALSE)
+install_dockermachine(version = "latest", force = FALSE)
 
 update_dockermachine()
 }
