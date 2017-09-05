@@ -2,33 +2,32 @@
 # (c) Yihui, GPL-3
 
 
-#' Install dockermachine
+#' Install docker-machine
 #'
-#' Download the appropriate dockermachine executable for your platform from Github and
-#' try to copy it to a system directory so \pkg{blogdown} can run the
-#' \command{dockermachine} command to build a site. \code{update_dockermachine()} is a wrapper of
-#' \code{install_dockermachine(force = TRUE)}.
+#' Download the appropriate docker-machine executable for your platform from Github and
+#' try to copy it to a system directory. \code{update_machine()} is a wrapper of
+#' \code{install_machine(force = TRUE)}.
 #'
-#' This function tries to install dockermachine to \code{Sys.getenv('APPDATA')} on
+#' This function tries to install docker-machine to \code{Sys.getenv('APPDATA')} on
 #' Windows, \file{~/Library/Application Support} on macOS, and \file{~/bin/} on
 #' other platforms (such as Linux). If these directories are not writable, the
 #' package directory \file{dockermachine} of \pkg{dockermachine} will be used. If it still
-#' fails, you have to install dockermachine by yourself and make sure it can be found via
+#' fails, you have to install docker-machine by yourself and make sure it can be found via
 #' the environment variable \code{PATH}.
 #'
-#' This is just a helper function and may fail to choose the correct dockermachine
+#' This is just a helper function and may fail to choose the correct docker-machine
 #' executable for your operating system, especially if you are not on Windows or
 #' Mac or a major Linux distribution. When in doubt, read the docker-machine documentation
 #' and install it by yourself: \url{https://docs.docker.com/machine/}.
-#' @param version The dockermachine version number, e.g., \code{0.26}; the special value
+#' @param version The docker-machine version number, e.g., \code{0.12.2}; the special value
 #'   \code{latest} means the latest version (fetched from Github releases).
 
-#' @param force Whether to install dockermachine even if it has already been installed.
-#'   This may be useful when upgrading dockermachine
+#' @param force Whether to install docker-machine even if it has already been installed.
+#'   This may be useful when upgrading docker-machine
 #' @export
 #'
 #' @importFrom utils download.file
-install_dockermachine = function(
+install_machine = function(
   version = 'latest', force = FALSE
 ) {
 
@@ -54,25 +53,22 @@ install_dockermachine = function(
   on.exit(setwd(owd), add = TRUE)
   unlink(sprintf('docker-machine_%s*', version), recursive = TRUE)
 
-  download_zip = function(OS, type = 'zip') {
-    zipfile = sprintf('docker-machine-%s-%s', OS, bit)
-    download2(paste0(base, zipfile), zipfile, mode = 'wb')
-    switch(type, zip = utils::unzip(zipfile), tar.gz = {
-      files = utils::untar(zipfile, list = TRUE)
-      utils::untar(zipfile)
-      files
-    })
+  ## not a zip file, but ready-to-go binary
+  download_zip = function(OS) {
+    sourcefile = sprintf('docker-machine-%s-%s', OS, bit)
+    download2(paste0(base, sourcefile), sourcefile, mode = 'wb')
+    sourcefile
+
   }
 
   files = if (is_windows()) {
     download_zip('Windows')
-  } #else if (is_osx()) {
-    else {
+  } else {
     download_zip(
       system2("uname", "-s", stdout = TRUE)
     )
   }
-  exec = files[grep(sprintf('^dockermachine_%s.+', version), basename(files))][1]
+  exec = files[grep(sprintf('^docker-machine-.+'), basename(files))][1]
   if (is_windows()) {
     file.rename(exec, 'docker-machine.exe')
     exec = 'docker-machine.exe'
@@ -98,14 +94,14 @@ install_dockermachine = function(
 }
 
 #' @export
-#' @rdname install_dockermachine
-update_dockermachine = function() install_dockermachine(force = TRUE)
+#' @rdname install_machine
+update_machine = function() install_machine(force = TRUE)
 
 
 
 
-# possible locations of the dockermachine executable
-bin_paths = function(dir = 'dockermachine', extra_path = getOption('dockermachine.dir')) {
+# possible locations of the docker-machine executable
+bin_paths = function(dir = 'docker-machine', extra_path = getOption('dockermachine.dir')) {
   if (is_windows()) {
     path = Sys.getenv('APPDATA', '')
     path = if (dir_exists(path)) file.path(path, dir)
@@ -136,36 +132,36 @@ find_exec = function(cmd, dir, info = '') {
   normalizePath(path)
 }
 
-find_dockermachine = local({
+find_machine = local({
   path = NULL  # cache the path to dockermachine
   function() {
     if (is.null(path)) {
       path <<- find_exec(
-        'dockermachine', 'dockermachine', 'You can install it via dockermachine::install_dockermachine()'
+        'docker-machine', 'docker-machine', 'You can install it via dockermachine::install_machine()'
       )
-      ver = dockermachine_version()
+      ver = machine_version()
     }
     path
   }
 })
 
-#' dockermachine_cmd
+#' machine_cmd
 #'
 #' Run an arbitrary docker-machine command
 #' @param ... Arguments to be passed to \code{system2('docker-machine', ...)}, e.g.
-#'   \code{new_content(path)} is basically \code{dockermachine_cmd(c('new', path))} (i.e.
+#'   \code{new_content(path)} is basically \code{machine_cmd(c('new', path))} (i.e.
 #'   run the command \command{docker-machine new path}).
 #' @export
-#' @describeIn dockermachine_cmd Run an arbitrary docker-machine command.
-dockermachine_cmd = function(...) {
-  system2(find_dockermachine(), ...)
+#' @describeIn machine_cmd Run an arbitrary docker-machine command.
+machine_cmd = function(...) {
+  system2(find_machine(), ...)
 }
 
 #' @export
-#' @describeIn dockermachine_cmd Return the version number of docker-machine if possible, which is
-#'   extracted from the output of \code{dockermachine_cmd('version')}.
-dockermachine_version = function() {
-  x = dockermachine_cmd('version', stdout = TRUE)
+#' @describeIn machine_cmd Return the version number of docker-machine if possible, which is
+#'   extracted from the output of \code{machine_cmd('version')}.
+machine_version = function() {
+  x = machine_cmd('version', stdout = TRUE)
   r = '^.* v([0-9.]{2,}).*$'
   if (grepl(r, x)) return(as.numeric_version(gsub(r, '\\1', x)))
   warning('Cannot extract the version number from docker-machine:')
@@ -176,7 +172,7 @@ dockermachine_version = function() {
 
 ## utils ##########################
 
-dockermachine <- function(args=character(), env=character()){
+machine <- function(args=character(), env=character()){
   system2("docker-machine", args=args, env=env)
 }
 
