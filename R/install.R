@@ -153,8 +153,8 @@ find_machine = local({
 #'   run the command \command{docker-machine new path}).
 #' @export
 #' @describeIn machine_cmd Run an arbitrary docker-machine command.
-machine_cmd = function(...) {
-  system2(find_machine(), ...)
+machine_cmd = function(args = character(), env = character(), stdout = TRUE, ...) {
+  system2(find_machine(), args = args, env = env, stdout = stdout, ...)
 }
 
 #' @export

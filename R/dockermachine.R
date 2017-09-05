@@ -250,11 +250,12 @@ machine_kill  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
 #' @inherit machine_create
 #' @references \url{https://docs.docker.com/machine/reference/ls/}
 #' @export
-# FIXME add the additional arguments
 machine_ls <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
                        swarm = FALSE,
                        env = character(),
                        ...){
+  # FIXME add the additional arguments
+
   args <- c("ls",
             bool_to_arg(swarm),
             name)
