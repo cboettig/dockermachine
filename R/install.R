@@ -162,8 +162,8 @@ machine_cmd = function(...) {
 #'   extracted from the output of \code{machine_cmd('version')}.
 machine_version = function() {
   x = machine_cmd('version', stdout = TRUE)
-  r = '^.* v([0-9.]{2,}).*$'
-  if (grepl(r, x)) return(as.numeric_version(gsub(r, '\\1', x)))
+  r = '^.*version ([0-9.]{3,}).*$'
+  if (grepl(r, x)) return((gsub(r, '\\1', x)))
   warning('Cannot extract the version number from docker-machine:')
   cat(x, sep = '\n')
 }

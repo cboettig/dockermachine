@@ -160,6 +160,7 @@ machine_env <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
                         shell = c("bash", "fish", "cmd", "powershell", "tcsh"),
                         unset = FALSE,
                         no_proxy = FALSE,
+                        help = FALSE,
                         env = character(),
                         ...)
 {
@@ -169,6 +170,7 @@ machine_env <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
             opts_to_args(list(shell = shell)),
             bool_to_arg(unset),
             bool_to_arg(no_proxy),
+            bool_to_arg(help),
             name)
   machine_cmd(args, env, ...)
 
@@ -178,28 +180,277 @@ machine_env <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
 #'
 #' Shows a list of commands or help for one command
 #' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/help/}
 #' @export
 machine_help <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
                          swarm = FALSE,
                          env = character(),
                          ...){
-  args <- c("config",
+  args <- c("help",
             bool_to_arg(swarm),
             name)
   machine_cmd(args, env = env, ...)
 }
-# machine_inspect
-# machine_ip
-# machine_kill
-# machine_ls
-# machine_provision
-# machine_regenerate_certs
-# machine_restart
-# machine_rm
-# machine_scp
-# machine_ssh
-# machine_start
-# machine_status
-# machine_stop
-# machine_upgrade
-# machine_url
+
+#' docker-machine inspect
+#'
+#' Inspect information about a machine
+#' @inherit machine_create
+#' @param format a Go formatting string
+#' @references \url{https://docs.docker.com/machine/reference/inspect/}
+#' @export
+machine_inspect <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                            swarm = FALSE,
+                            format = list(),
+                            env = character(),
+                            ...){
+  args <- c("inspect",
+            bool_to_arg(swarm),
+            opts_to_args(format, "format"),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine ip
+#'
+#' Get the IP address of one or more machines.
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/ip/}
+#' @export
+machine_ip  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                        swarm = FALSE,
+                        env = character(),
+                        ...){
+  args <- c("ip",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+
+#' docker-machine kill
+#'
+#' Kill (abruptly force stop) a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/kill/}
+#' @export
+machine_kill  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                          swarm = FALSE,
+                          env = character(),
+                          ...){
+  args <- c("kill",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine ls
+#'
+#' List machines
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/ls/}
+#' @export
+# FIXME add the additional arguments
+machine_ls <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                       swarm = FALSE,
+                       env = character(),
+                       ...){
+  args <- c("ls",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+
+#' Re-run provisioning on a created machine.
+
+#' Sometimes it may be helpful to re-run Machine’s provisioning
+#'  process on a created machine.
+#'
+#' Reasons for doing so may include a failure during the original
+#'  provisioning process, or a drift from the desired system state
+#'  (including the originally specified Swarm or Engine configuration).
+#'
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/provision/}
+#' @export
+machine_provision  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                               swarm = FALSE,
+                               env = character(),
+                               ...){
+  args <- c("provision",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine regenerate-certs
+#'
+#' Regenerate TLS Certificates for a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/regenerate-certs/}
+#' @export
+machine_regenerate_certs  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                                      swarm = FALSE,
+                                      env = character(),
+                                      ...){
+  args <- c("regenerate-certs",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+
+#' docker-machine restart
+#'
+#' Restart a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/restart/}
+#' @export
+machine_restart  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                             swarm = FALSE,
+                             env = character(),
+                             ...){
+  args <- c("restart",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine rm
+#'
+#' Remove a machine
+#' @inherit machine_create
+#' @param force force removal rather than asking first, logical, default TRUE
+#' @references \url{https://docs.docker.com/machine/reference/rm/}
+#' @export
+machine_rm  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                        swarm = FALSE,
+                        force = TRUE,
+                        help = FALSE,
+                        env = character(),
+                        ...){
+  args <- c("rm",
+            bool_to_arg(swarm),
+            bool_to_arg(force),
+            bool_to_arg(help),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine scp
+#'
+#' Copy files to a machine over scp
+#' @param from source machine, the notation is \code{machinename:/path/to/files}
+#' @param to target machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/scp/}
+#' @export
+machine_scp  <- function(from, to,
+                         swarm = FALSE,
+                         env = character(),
+                         ...){
+  args <- c("scp",
+            bool_to_arg(swarm),
+            from,
+            to)
+  machine_cmd(args, env = env, ...)
+}
+
+
+#' docker-machine ssh
+#'
+#' ssh into a machine a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/ssh/}
+## FIXME needs interactive use to open terminal (?)
+machine_ssh  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                         swarm = FALSE,
+                         env = character(),
+                         ...){
+  args <- c("ssh",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine start
+#'
+#' Start a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/start/}
+#' @export
+machine_start  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                           swarm = FALSE,
+                           env = character(),
+                           ...){
+  args <- c("start",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine status
+#'
+#' Get the status of a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/status/}
+#' @export
+machine_status  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                            swarm = FALSE,
+                            env = character(),
+                            ...){
+  args <- c("status",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine stop
+#'
+#' Gracefully stop a machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/stop/}
+#' @export
+machine_stop  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                          swarm = FALSE,
+                          env = character(),
+                          ...){
+  args <- c("stop",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine upgrade
+#'
+#' Upgrade to the latest version of docker on the machine
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/upgrade/}
+#' @export
+machine_upgrade  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                             swarm = FALSE,
+                             env = character(),
+                             ...){
+  args <- c("upgrade",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
+#' docker-machine url
+#'
+#' Get the URL of a host
+#' @inherit machine_create
+#' @references \url{https://docs.docker.com/machine/reference/url/}
+#' @export
+machine_url  <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
+                         swarm = FALSE,
+                         env = character(),
+                         ...){
+  args <- c("url",
+            bool_to_arg(swarm),
+            name)
+  machine_cmd(args, env = env, ...)
+}
+
