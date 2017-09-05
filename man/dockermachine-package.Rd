@@ -8,6 +8,9 @@
 \description{
 An R interface to docker-machine.
 }
+\references{
+\url{https://docs.docker.com/machine/reference}
+}
 \author{
 \strong{Maintainer}: Carl Boettiger \email{cboettig@gmail.com} (http://orcid.org/0000-0002-1642-628X) [copyright holder]
 

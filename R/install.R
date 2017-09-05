@@ -171,3 +171,33 @@ dockermachine_version = function() {
   warning('Cannot extract the version number from docker-machine:')
   cat(x, sep = '\n')
 }
+
+
+
+## utils ##########################
+
+dockermachine <- function(args=character(), env=character()){
+  system2("docker-machine", args=args, env=env)
+}
+
+opts_to_args <- function(x, prefix=character()){
+  if(length(prefix) > 0)  prefix <- paste0(prefix, "-")
+  # drop empty arguments
+  x <- x[vapply(x, length, integer(1)) > 0]
+  out <- character()
+  for(i in seq_along(x)){
+    out <- c(out,
+             paste0("--", prefix, gsub("_", "-", names(x[i])), " ", x[[i]]))
+  }
+  out
+}
+
+# swarm = TRUE ==> "--swarm"
+bool_to_arg <- function(bool){
+  if(bool)
+    paste0("--", gsub("_", "-", deparse(substitute(bool))))
+  else
+    character()
+}
+
+####################################
