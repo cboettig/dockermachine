@@ -10,7 +10,7 @@ install_machine(version = "latest", force = FALSE)
 update_machine()
 }
 \arguments{
-\item{version}{The docker-machine version number, e.g., \code{1.12}; the special value
+\item{version}{The docker-machine version number, e.g., \code{0.12.2}; the special value
 \code{latest} means the latest version (fetched from Github releases).}
 
 \item{force}{Whether to install docker-machine even if it has already been installed.

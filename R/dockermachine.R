@@ -22,7 +22,7 @@
 #'
 #' @export
 machine_active <- function(help = FALSE, env = character(), ...){
-  dockermachine(c("active", bool_to_arg(help)), env = env)
+  machine_cmd(c("active", bool_to_arg(help)), env = env)
 }
 
 #' docker-machine config
@@ -67,7 +67,7 @@ machine_config <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
             bool_to_arg(help),
             name)
 
-  dockermachine(args, env = env, ...)
+  machine_cmd(args, env = env, ...)
 }
 
 
@@ -147,7 +147,7 @@ machine_create <- function(driver = c("none","virtualbox", "amazonec2", "digital
             opts_to_args(swarm_conf, 'swarm'),
             bool_to_arg(help),
             name)
-  dockermachine(args, env = env, ...)
+  machine_cmd(args, env = env, ...)
 }
 
 # docker-machine env
@@ -170,7 +170,7 @@ machine_env <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
             bool_to_arg(unset),
             bool_to_arg(no_proxy),
             name)
-  dockermachine(args, env, ...)
+  machine_cmd(args, env, ...)
 
 }
 
@@ -186,7 +186,7 @@ machine_help <- function(name = getOption("DOCKERMACHINE_NAME", "machine"),
   args <- c("config",
             bool_to_arg(swarm),
             name)
-  dockermachine(args, env = env, ...)
+  machine_cmd(args, env = env, ...)
 }
 # machine_inspect
 # machine_ip

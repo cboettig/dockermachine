@@ -172,9 +172,6 @@ machine_version = function() {
 
 ## utils ##########################
 
-machine <- function(args=character(), env=character()){
-  system2("docker-machine", args=args, env=env)
-}
 
 opts_to_args <- function(x, prefix=character()){
   if(length(prefix) > 0)  prefix <- paste0(prefix, "-")
